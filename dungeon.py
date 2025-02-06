@@ -111,11 +111,21 @@ def reduce_boss_connections(boss_coord):
                         neighbor_room["connections"].pop(ndir)
                         break
 
-def generate_dungeon():
-    spawn_coord = (0, 0)
-    dfs(*spawn_coord)
-    add_extra_connections()
-    boss_coord = choose_boss_room(spawn_coord)
-    ensure_items(boss_coord)
-    reduce_boss_connections(boss_coord)
-    return spawn_coord, boss_coord, dungeon
+def generate_dungeon(min_rooms=10):
+    global dungeon, visited, ITEM_COUNTS
+    while True:
+        # Reset global containers
+        dungeon = {}
+        visited = set()
+        ITEM_COUNTS = {item: 0 for item in ITEM_CONFIG}
+        
+        spawn_coord = (0, 0)
+        dfs(*spawn_coord)
+        add_extra_connections()
+        
+        # Check if we have reached the minimum room count.
+        if len(dungeon) >= min_rooms:
+            boss_coord = choose_boss_room(spawn_coord)
+            ensure_items(boss_coord)
+            reduce_boss_connections(boss_coord)
+            return spawn_coord, boss_coord, dungeon
